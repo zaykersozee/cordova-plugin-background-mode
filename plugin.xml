@@ -24,7 +24,6 @@
     <engines>
         <engine name="cordova" version=">=3.0.0" />
         <engine name="android-sdk" version=">=16" />
-        <engine name="windows-sdk" version=">=10.0.14393.0" />
     </engines>
 
     <!-- js -->
@@ -59,9 +58,11 @@
     <!-- android -->
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
-            <feature name="BackgroundMode" >
-                <param name="android-package"
-                      value="de.appplant.cordova.plugin.background.BackgroundMode"/>
+            <feature name="BackgroundMode">
+                <param name="android-package" value="de.appplant.cordova.plugin.background.BackgroundMode"/>
+            </feature>
+            <feature name="BackgroundModeExt">
+                <param name="android-package" value="de.appplant.cordova.plugin.background.BackgroundModeExt"/>
             </feature>
         </config-file>
 
@@ -75,6 +76,9 @@
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
             <uses-permission android:name="android.permission.WAKE_LOCK" />
+            <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+            <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+            <uses-permission android:name="android.permission.DEVICE_POWER" />
         </config-file>
 
         <source-file
@@ -82,39 +86,15 @@
             target-dir="src/de/appplant/cordova/plugin/background" />
 
         <source-file
-            src="src/android/BackgroundExt.java"
+            src="src/android/BackgroundModeExt.java"
             target-dir="src/de/appplant/cordova/plugin/background" />
 
         <source-file
             src="src/android/ForegroundService.java"
             target-dir="src/de/appplant/cordova/plugin/background" />
+
+        <!--framework src="android-build.gradle" custom="true" type="gradleReference" /-->
     </platform>
-
-    <!-- windows
-    <platform name="windows">
-        <config-file target="config.xml" parent="/*">
-            <feature name="BackgroundMode" >
-                <param name="windows-package" value="BackgroundMode"/>
-            </feature>
-        </config-file>
-
-        <config-file target="package.appxmanifest" parent="/Package/Capabilities" device-target="windows">
-            <Capability Name="backgroundMediaPlayback" />
-        </config-file>
-
-        <config-file target="config.xml" parent="/*">
-            <preference name="windows-target-version" value="UAP" />
-            <preference name="uap-target-min-version" value="10.0.14393.0" />
-            <preference name="Windows.Universal-MinVersion" value="10.0.14393.0" />
-            <preference name="Windows.Universal" value="10.0.14393.0" />
-        </config-file>
-
-        <resource-file src="appbeep.wma" target="appbeep.wma" />
-
-        <js-module src="src/windows/BackgroundModeProxy.js" name="BackgroundMode.Proxy">
-            <runs />
-        </js-module>
-    </platform> -->
 
     <!-- browser -->
     <platform name="browser">

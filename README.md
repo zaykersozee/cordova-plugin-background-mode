@@ -149,7 +149,8 @@ cordova.plugins.backgroundMode.setDefaults({
     color: String // hex format like 'F14F4D'
     resume: Boolean,
     hidden: Boolean,
-    bigText: Boolean
+    bigText: Boolean,
+    largeIcon: String
 })
 ```
 
@@ -174,7 +175,7 @@ Various APIs like playing media or tracking GPS position in background might not
 
 ```js
 cordova.plugins.backgroundMode.on('activate', function() {
-   cordova.plugins.backgroundMode.disableWebViewOptimizations(); 
+   cordova.plugins.backgroundMode.disableWebViewOptimizations();
 });
 ```
 
