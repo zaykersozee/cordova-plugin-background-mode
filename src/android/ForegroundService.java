@@ -24,25 +24,23 @@ package de.appplant.cordova.plugin.background;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.app.NotificationChannel;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import org.json.JSONObject;
-import com.tencent.bugly.crashreport.CrashReport;
 
 import static android.os.PowerManager.PARTIAL_WAKE_LOCK;
-
 
 /**
  * Puts the service in a foreground state, where the system considers it to be
@@ -52,7 +50,7 @@ import static android.os.PowerManager.PARTIAL_WAKE_LOCK;
 public class ForegroundService extends Service {
 
     // Fixed ID for the 'foreground' notification
-    public static final int NOTIFICATION_ID = 20190814;
+    public static final int NOTIFICATION_ID = -574543954;
 
     // Default title of the background notification
     private static final String NOTIFICATION_TITLE =
@@ -101,7 +99,6 @@ public class ForegroundService extends Service {
     public void onCreate()
     {
         super.onCreate();
-        CrashReport.initCrashReport(getApplicationContext());
         keepAwake();
     }
 
@@ -134,7 +131,7 @@ public class ForegroundService extends Service {
         boolean isSilent    = settings.optBoolean("silent", false);
 
         if (!isSilent) {
-            startForeground(NOTIFICATION_ID, makeNotification(settings));
+            startForeground(NOTIFICATION_ID, makeNotification());
         }
 
         PowerManager pm = (PowerManager)getSystemService(POWER_SERVICE);
@@ -151,7 +148,6 @@ public class ForegroundService extends Service {
     private void sleepWell()
     {
         stopForeground(true);
-
         getNotificationManager().cancel(NOTIFICATION_ID);
 
         if (wakeLock != null) {
@@ -164,10 +160,10 @@ public class ForegroundService extends Service {
      * Create a notification as the visible part to be able to put the service
      * in a foreground state by using the default settings.
      */
-    //private Notification makeNotification()
-    //{
-    //    return makeNotification(BackgroundMode.getSettings());
-    //}
+    private Notification makeNotification()
+    {
+        return makeNotification(BackgroundMode.getSettings());
+    }
 
     /**
      * Create a notification as the visible part to be able to put the service
@@ -197,14 +193,14 @@ public class ForegroundService extends Service {
             getNotificationManager().createNotificationChannel(mChannel);
             Log.d("ForegroundService", "makeNotification # createNotificationChannel");
         }
-        String title = settings.optString("title", NOTIFICATION_TITLE);
-        String text = settings.optString("text", NOTIFICATION_TEXT);
+        String title    = settings.optString("title", NOTIFICATION_TITLE);
+        String text     = settings.optString("text", NOTIFICATION_TEXT);
         boolean bigText = settings.optBoolean("bigText", false);
-        String largeIcon = settings.optString("largeIcon", null);
 
         Context context = getApplicationContext();
-        String pkgName = context.getPackageName();
-        Intent intent = context.getPackageManager().getLaunchIntentForPackage(pkgName);
+        String pkgName  = context.getPackageName();
+        Intent intent   = context.getPackageManager()
+                .getLaunchIntentForPackage(pkgName);
 
         Notification.Builder builder = new Notification.Builder(context, CHANNEL_ID)
             .setContentTitle(title)
@@ -212,8 +208,6 @@ public class ForegroundService extends Service {
             .setOngoing(true)
             .setSmallIcon(getIconResId(settings));
 
-        if(largeIcon != null)
-            builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), getLargeIconResId(largeIcon)));
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
         	builder.setChannelId(CHANNEL_ID);
@@ -223,7 +217,7 @@ public class ForegroundService extends Service {
             builder.setPriority(Notification.PRIORITY_MIN);
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {//8.0以下 && 7.0及以上 设置优先级
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             builder.setPriority(NotificationManager.IMPORTANCE_HIGH);
         } else {
             builder.setPriority(Notification.PRIORITY_HIGH);
@@ -261,7 +255,6 @@ public class ForegroundService extends Service {
         }
 
         Notification notification = makeNotification(settings);
-
         getNotificationManager().notify(NOTIFICATION_ID, notification);
 
     }
@@ -307,47 +300,9 @@ public class ForegroundService extends Service {
     }
 
     /**
-     * Retrieves the resource ID of the app icon.
-     *
-     * @param settings A JSON dict containing the icon name.
-     */
-    private int getLargeIconResId (String icon)
-    {
-        int resId = getLargeIconResId(icon, "mipmap");
-
-        if (resId == 0) {
-            resId = getLargeIconResId(icon, "drawable");
-        }
-
-        return resId;
-    }
-
-    /**
-     * Retrieve resource id of the specified icon.
-     *
-     * @param icon The name of the icon.
-     * @param type The resource type where to look for.
-     *
-     * @return The resource id or 0 if not found.
-     */
-    private int getLargeIconResId (String icon, String type)
-    {
-        Resources res  = getResources();
-        String pkgName = getPackageName();
-
-        int resId = res.getIdentifier(icon, type, pkgName);
-
-        if (resId == 0) {
-            resId = res.getIdentifier("icon", type, pkgName);
-        }
-
-        return resId;
-    }
-
-    /**
      * Set notification color if its supported by the SDK.
      *
-     * @param builder A Notification.Builder instance
+     * @param notification A Notification.Builder instance
      * @param settings A JSON dict containing the color definition (red: FF0000)
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)

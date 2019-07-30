@@ -417,8 +417,7 @@ exports._defaults =
     silent:  false,
     hidden:  true,
     color:   undefined,
-    icon:    'icon',
-    largeIcon: undefined
+    icon:    'icon'
 };
 
 /**
